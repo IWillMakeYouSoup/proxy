@@ -1,2 +1,6 @@
 node_modules
+dist
+originalRequests
+changedRequest
 requests
+web/client/dist

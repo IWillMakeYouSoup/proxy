@@ -1,18 +1,29 @@
 import { transformJson } from '../helpers.js';
 
-const test = {
-  status: 'Success',
-  sources: [
-    {
-      source: 'ITP111',
-      status: 'Success',
-      updatedAt: '2026-04-16T13:58:03+02:00',
-      expiresAt: '2026-04-17T00:00:00+02:00',
-      isStaleData: false,
-    },
-  ],
-  traceId: '1a9a69b367e14b7a9e9cdb13d5626e16',
-};
+const body = {
+  "context": {
+    "status": "Success",
+    "sources": [
+      {
+        "source": "ITP",
+        "status": "Success",
+            "updatedAt": "2026-05-20T13:16:42+02:00"
+      }
+    ],
+    "traceId": "82562434703c4b51b7a97805898fea24"
+  },
+  "data": {
+    "individId": "cdcc343b-eed6-455a-892d-39594c9470a2",
+    "valKraverHd": false,
+    "varningarFinns": true,
+    "varningar": [
+      {
+        "orsak": "Prisets på valt familjeskydd är högre än inbetald premie.",
+        "orsakskod": "407"
+      }
+    ]
+  }
+}
 
 /**
  * Interceptor shape:
@@ -33,19 +44,19 @@ export default [
   {
     name: 'individuellaVal',
 
-    // match: { method: 'GET', path: '/api/individuella-val' },
+    match: { method: 'POST', path: '/individuella-val/v1/familjeskyddskontroll/ITP1' },
 
     transform(upstreamRes, _req) {
       // Example: inject a field into the JSON response body
       // return transformJson(upstreamRes, body => ({ ...body, extra: 'injected' }));
 
       // Example: override the status code
-      // upstreamRes.status = 200;
+      upstreamRes.status = 400;
 
       // Example: add a response header
       // upstreamRes.headers['x-intercepted-by'] = 'individer';
       
-      return transformJson(upstreamRes, body => ({ ...body, context: test }));
+      return transformJson(upstreamRes, body => ({ ...body, data: {...body.data, varningar } }));
     },
   },
 ];

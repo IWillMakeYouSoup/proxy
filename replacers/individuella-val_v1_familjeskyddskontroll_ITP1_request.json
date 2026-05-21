@@ -1,0 +1,31 @@
+{
+  "matchPath": "/individuella-val/v1/familjeskyddskontroll/ITP1",
+  "matchMethod": "POST",
+  "type": "request",
+  "content": {
+    "method": "POST",
+    "path": "/individuella-val/v1/familjeskyddskontroll/ITP1",
+    "query": {},
+    "headers": {
+      "accept": "application/json",
+      "content-type": "application/json",
+      "apikey": "MISSING_API_KEY",
+      "authorization": "bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImJNaUdma2o4UFh3Tk1IZ3pVclNZWUJqdUtqcFE2aTZZRTVnSU5kc0sybjQiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3NzkzNjAyODIsIm5iZiI6MTc3OTM1NjY4MiwidmVyIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9hdnRhbGF0YWFkYjJjdGVzdC5iMmNsb2dpbi5jb20vMDU0YjgyYTAtOTQxYy00ZDcxLWFlMjItMmUyYWU1MmQzYjAyL3YyLjAvIiwic3ViIjoiNWNkZmY1ZWItOTk1OC00YTM2LTlmYTQtY2Y0YWJiNGUxMjE1IiwiYXVkIjoiYWFkN2YyNGEtNTQ3Yy00YTQyLWFhNzYtNWEzZGQ1YzA5NzkwIiwiYWNyIjoiYjJjXzFhX3NpZ251cHNpZ25pbl9iYW5raWRtb2NrX3YyIiwibm9uY2UiOiIwMTllNDllYy0zOGM5LTc1OTMtYjE4ZS1jYjE2MmJmZDA2YjAiLCJpYXQiOjE3NzkzNTY2ODIsImF1dGhfdGltZSI6MTc3OTM1NjY4MiwiZ2l2ZW5fbmFtZSI6IlRlc3RwZXJzb24iLCJmYW1pbHlfbmFtZSI6IsOFdHRhIiwicGVyc29ubnVtbWVyIjoiMTk3NTEwMjQ3MTc5IiwidXNlckVtYWlsIjoiZnJlZHJpay5sYXJzc29uQGZvcmEuc2UiLCJvaWQiOiI1Y2RmZjVlYi05OTU4LTRhMzYtOWZhNC1jZjRhYmI0ZTEyMTUiLCJpbmRpdmlkSWQiOiJhZWJiYzhjMi0yYzFhLTQ4YTEtYTY0OC05MTI0ZDlhYjA4MDQiLCJhdnRhbHNmb3JzYWtyaW5nc29tcmFkZW4iOlsiSVRQIl0sImF2bGlkZW4iOmZhbHNlLCJza3lkZGFkUGVyc29udXBwZ2lmdCI6ZmFsc2UsIml0cEluZGl2aWRJZCI6IjExNzQ3MDk2IiwiYXNsSW5kaXZpZElkIjoiIiwidHlwIjoiQW5zdGFsbGQiLCJqdGkiOiJjNTFiY2I0MC03ZGMyLTRlNDctYjA4ZS0wZjZjNGZkMWJmNTUiLCJzaWduSW5NZXRob2QiOiJiYW5raWRtb2NrIiwib3JkZXJSZWYiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEifQ.AOkTDBNF6ZmgOv2c5VVBkRKEsnGzNHnQZDI_nfsP25ehEkttv6DJFurOCTffPsk6JybH_PSG8Fq2OIGCdALWdLDXqYpYWLtBznwP6BOnXYL7eGMV6bNXfhAJx8j4v34msA5NxZSjhX2_mZOCGoHI8fVtumVAFsNz5HyCJW0FqOKOlsKcoLc02vJbGWMsKVAW5t5l0vq_za7abZWkDZ1Liup8-KFauFssm-lrFJSSHNdSRK5DBSh7V-bGrNIbJ6yHYlZoE78sS68s60q1kkmGBh-BEN4d4_IK0eT1D43vFZVUbpxBiqVWXOIl8vitjJrGHgCOncmfZN1g_RXV3pAErg",
+      "user-agent": "axios/1.15.2",
+      "content-length": "90",
+      "accept-encoding": "gzip, compress, deflate, br",
+      "request-context": "appId=cid-v1:",
+      "request-id": "|ada3619e1a2f477d912d78cea0bbfb81.454a40236eff4105.",
+      "x-ms-request-id": "ada3619e1a2f477d912d78cea0bbfb81",
+      "x-ms-request-root-id": "|ada3619e1a2f477d912d78cea0bbfb81.454a40236eff4105.",
+      "traceparent": "00-ada3619e1a2f477d912d78cea0bbfb81-454a40236eff4105-01"
+    },
+    "body": {
+      "ersattningar": {
+        "antalBasbelopp": 3,
+        "basbeloppstyp": "Prisbasbelopp",
+        "utbetalningstid": 10
+      }
+    }
+  }
+}
