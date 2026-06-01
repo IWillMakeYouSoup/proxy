@@ -105,14 +105,14 @@ export const mocks: Mock[] = [];
 export function requestTransform(
   axiosConfig: AxiosRequestConfig,
   req: Request,
+  identity: string,
 ): AxiosRequestConfig {
-  axiosConfig = applyRequestReplacer(axiosConfig, req);
+  axiosConfig = applyRequestReplacer(axiosConfig, req, identity);
 
   const method = axiosConfig.method ?? req.method;
-  const reqPath = req.path;
 
   for (const interceptor of requestInterceptors) {
-    if (matches(interceptor, method, reqPath)) {
+    if (matches(interceptor, method, identity)) {
       console.log('Request interceptor matched:', interceptor.name);
       axiosConfig = interceptor.transform(axiosConfig) ?? axiosConfig;
     }
@@ -124,11 +124,12 @@ export function requestTransform(
 export function responseTransform(
   upstreamRes: AxiosResponse,
   req: Request,
+  identity: string,
 ): AxiosResponse {
-  upstreamRes = applyResponseReplacer(upstreamRes, req);
+  upstreamRes = applyResponseReplacer(upstreamRes, req, identity);
 
   for (const interceptor of responseInterceptors) {
-    if (matches(interceptor, req.method, req.path)) {
+    if (matches(interceptor, req.method, identity)) {
       console.log('Response interceptor matched:', interceptor.name);
       upstreamRes = interceptor.transform(upstreamRes, req) ?? upstreamRes;
     }

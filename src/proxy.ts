@@ -4,6 +4,8 @@ import type { Request, Response } from 'express';
 import { requestTransform, responseTransform } from './rules.ts';
 import { logPair } from './logger.ts';
 import { storeChanged, storeOriginal } from './store.ts';
+import { UPSTREAM_OVERRIDES } from './upstreams.ts';
+import { deriveIdentity } from './identity.ts';
 
 const HOP_BY_HOP = new Set([
   'connection',
@@ -30,10 +32,17 @@ function buildUpstreamHeaders(reqHeaders: Record<string, any>): Record<string, s
 export async function proxyHandler(req: Request, res: Response): Promise<void> {
   console.log(`[proxy] ← ${req.method} ${req.originalUrl}`);
 
-  let baseUrl = (process.env.BASE_URL ?? '').replace(/\/$/, '');
+  const identity = deriveIdentity(req);
   const apiSegment = req.path.split('/').find(Boolean) ?? '';
-  baseUrl = baseUrl.replaceAll('<api>', apiSegment);
-  const upstreamUrl = baseUrl + req.path.replace('/' + apiSegment, '');
+  const override = UPSTREAM_OVERRIDES[apiSegment];
+
+  let upstreamUrl: string;
+  if (override) {
+    upstreamUrl = override.replace(/\/$/, '') + req.path.replace('/' + apiSegment, '');
+  } else {
+    const baseUrl = (process.env.BASE_URL ?? '').replace(/\/$/, '').replaceAll('<api>', apiSegment);
+    upstreamUrl = baseUrl + req.path.replace('/' + apiSegment, '');
+  }
   console.log(upstreamUrl);
 
   const rawAxiosConfig: AxiosRequestConfig = {
@@ -56,7 +65,7 @@ export async function proxyHandler(req: Request, res: Response): Promise<void> {
     params: { ...(rawAxiosConfig.params as object) },
   };
 
-  const finalAxiosConfig = requestTransform(rawAxiosConfig, req);
+  const finalAxiosConfig = requestTransform(rawAxiosConfig, req, identity);
 
   const start = Date.now();
   let upstreamRes: AxiosResponse;
@@ -82,12 +91,12 @@ export async function proxyHandler(req: Request, res: Response): Promise<void> {
       : upstreamRes.data,
   };
 
-  storeOriginal(req, originalRequestSnapshot, rawResponseSnapshot);
+  storeOriginal(req, identity, originalRequestSnapshot, rawResponseSnapshot);
 
-  const finalUpstreamRes = responseTransform(upstreamRes, req);
+  const finalUpstreamRes = responseTransform(upstreamRes, req, identity);
 
   logPair(req, finalAxiosConfig.data, finalUpstreamRes, durationMs);
-  storeChanged(req, finalAxiosConfig, finalUpstreamRes);
+  storeChanged(req, identity, finalAxiosConfig, finalUpstreamRes);
 
   for (const [key, value] of Object.entries(finalUpstreamRes.headers)) {
     if (!HOP_BY_HOP.has(key.toLowerCase())) {

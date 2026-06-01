@@ -30,13 +30,14 @@ function tryParseJson(data: unknown): unknown {
 
 function buildRecord(
   req: Request,
+  identity: string,
   axiosConfig: AxiosRequestConfig,
   upstreamRes: AxiosResponse,
 ): StoredRecord {
   return {
     request: {
       method: req.method,
-      path: req.path,
+      path: identity,
       query: req.query as Record<string, unknown>,
       headers: (axiosConfig.headers ?? {}) as Record<string, string>,
       body: axiosConfig.data ?? null,
@@ -51,24 +52,26 @@ function buildRecord(
 
 export function storeOriginal(
   req: Request,
+  identity: string,
   rawAxiosConfig: AxiosRequestConfig,
   rawUpstreamRes: AxiosResponse,
 ): void {
-  const file = join(ORIGINAL_DIR, toRecordFileName(req.method, req.path));
+  const file = join(ORIGINAL_DIR, toRecordFileName(req.method, identity));
   writeFileSync(
     file,
-    JSON.stringify(buildRecord(req, rawAxiosConfig, rawUpstreamRes), null, 2),
+    JSON.stringify(buildRecord(req, identity, rawAxiosConfig, rawUpstreamRes), null, 2),
   );
 }
 
 export function storeChanged(
   req: Request,
+  identity: string,
   finalAxiosConfig: AxiosRequestConfig,
   finalUpstreamRes: AxiosResponse,
 ): void {
-  const file = join(CHANGED_DIR, toRecordFileName(req.method, req.path));
+  const file = join(CHANGED_DIR, toRecordFileName(req.method, identity));
   writeFileSync(
     file,
-    JSON.stringify(buildRecord(req, finalAxiosConfig, finalUpstreamRes), null, 2),
+    JSON.stringify(buildRecord(req, identity, finalAxiosConfig, finalUpstreamRes), null, 2),
   );
 }

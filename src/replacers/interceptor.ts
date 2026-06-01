@@ -14,19 +14,20 @@ function buildUpstreamUrl(path: string): string {
 export function applyRequestReplacer(
   axiosConfig: AxiosRequestConfig,
   req: Request,
+  identity: string,
 ): AxiosRequestConfig {
-  const replacer = getRequestReplacer(req.method, req.path) as RequestReplacer | undefined;
+  const replacer = getRequestReplacer(req.method, identity) as RequestReplacer | undefined;
   if (!replacer) return axiosConfig;
 
   const { content } = replacer;
-  console.log(`[replacers] applying request replacer: ${req.method} ${req.path}`);
+  console.log(`[replacers] applying request replacer: ${req.method} ${identity}`);
 
   return {
     ...axiosConfig,
     method: content.method,
     url: buildUpstreamUrl(content.path),
     headers: { ...content.headers },
-    params: { ...(content.query ?? {}) },
+    params: { ...content.query },
     data: content.body ?? undefined,
   };
 }
@@ -34,12 +35,13 @@ export function applyRequestReplacer(
 export function applyResponseReplacer(
   upstreamRes: AxiosResponse,
   req: Request,
+  identity: string,
 ): AxiosResponse {
-  const replacer = getResponseReplacer(req.method, req.path) as ResponseReplacer | undefined;
+  const replacer = getResponseReplacer(req.method, identity) as ResponseReplacer | undefined;
   if (!replacer) return upstreamRes;
 
   const { content } = replacer;
-  console.log(`[replacers] applying response replacer: ${req.method} ${req.path}`);
+  console.log(`[replacers] applying response replacer: ${req.method} ${identity}`);
 
   const bodyBuffer =
     typeof content.body === 'string'
