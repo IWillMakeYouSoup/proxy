@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { Router } from 'express';
 
@@ -43,6 +43,38 @@ endpointsRouter.get('/', (_req, res) => {
     `${a.method} ${a.path}`.localeCompare(`${b.method} ${b.path}`),
   );
   res.json(summaries);
+});
+
+function hasReplacer(path: string): boolean {
+  return (
+    existsSync(join(REPLACERS_DIR, toReplacerFileName(path, 'request'))) ||
+    existsSync(join(REPLACERS_DIR, toReplacerFileName(path, 'response')))
+  );
+}
+
+// mode 'all' removes every captured request; 'keepModified' removes only the
+// records that have no active request/response replacer.
+endpointsRouter.post('/clear', (req, res) => {
+  const mode = (req.body as { mode?: unknown })?.mode;
+  if (mode !== 'all' && mode !== 'keepModified') {
+    res.status(400).json({ error: "mode must be 'all' or 'keepModified'" });
+    return;
+  }
+  if (!existsSync(ORIGINAL_DIR)) {
+    res.json({ deleted: 0 });
+    return;
+  }
+  const files = readdirSync(ORIGINAL_DIR).filter((f) => f.endsWith('.json'));
+  let deleted = 0;
+  for (const f of files) {
+    if (mode === 'keepModified') {
+      const record = readRecord(join(ORIGINAL_DIR, f));
+      if (record && hasReplacer(record.request.path)) continue;
+    }
+    unlinkSync(join(ORIGINAL_DIR, f));
+    deleted++;
+  }
+  res.json({ deleted });
 });
 
 endpointsRouter.get('/:id', (req, res) => {

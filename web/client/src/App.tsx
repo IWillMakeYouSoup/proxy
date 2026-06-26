@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Drawer } from './components/Drawer';
 import { MainPanel } from './components/MainPanel';
-import { listEndpoints } from './api';
+import { clearEndpoints, listEndpoints } from './api';
+import type { ClearMode } from './api';
 import type { EndpointSummary } from './types';
 
 export default function App() {
@@ -21,6 +22,20 @@ export default function App() {
     }
   };
 
+  const handleClear = async (mode: ClearMode) => {
+    try {
+      await clearEndpoints(mode);
+      const list = await listEndpoints();
+      setEndpoints(list);
+      if (selectedId && !list.some((e) => e.id === selectedId)) {
+        setSelectedId(list.length > 0 ? list[0].id : null);
+      }
+    } catch (err) {
+      setError((err as Error).message);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -35,6 +50,7 @@ export default function App() {
         selectedId={selectedId}
         onSelect={setSelectedId}
         onRefresh={refresh}
+        onClear={handleClear}
       />
       <div className="flex-1 overflow-hidden">
         {error && (

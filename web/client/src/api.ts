@@ -12,6 +12,16 @@ export function listEndpoints(): Promise<EndpointSummary[]> {
   return fetch('/api/endpoints').then((r) => jsonOrThrow<EndpointSummary[]>(r));
 }
 
+export type ClearMode = 'all' | 'keepModified';
+
+export function clearEndpoints(mode: ClearMode): Promise<{ deleted: number }> {
+  return fetch('/api/endpoints/clear', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode }),
+  }).then((r) => jsonOrThrow<{ deleted: number }>(r));
+}
+
 export function getEndpoint(id: string): Promise<StoredRecord> {
   return fetch(`/api/endpoints/${encodeURIComponent(id)}`).then((r) =>
     jsonOrThrow<StoredRecord>(r),

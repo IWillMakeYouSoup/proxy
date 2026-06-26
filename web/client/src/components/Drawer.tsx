@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import type { EndpointSummary } from '../types';
+import type { ClearMode } from '../api';
+import { ClearModal } from './ClearModal';
 
 interface Props {
   endpoints: EndpointSummary[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   onRefresh: () => void;
+  onClear: (mode: ClearMode) => Promise<void>;
 }
 
 const methodColor: Record<string, string> = {
@@ -15,17 +19,57 @@ const methodColor: Record<string, string> = {
   DELETE: 'text-red-700 bg-red-50',
 };
 
-export function Drawer({ endpoints, selectedId, onSelect, onRefresh }: Props) {
+export function Drawer({
+  endpoints,
+  selectedId,
+  onSelect,
+  onRefresh,
+  onClear,
+}: Props) {
+  const [filter, setFilter] = useState('');
+  const [showClear, setShowClear] = useState(false);
+
+  const query = filter.trim().toLowerCase();
+  const filtered = query
+    ? endpoints.filter(
+        (e) =>
+          e.path.toLowerCase().includes(query) ||
+          e.method.toLowerCase().includes(query),
+      )
+    : endpoints;
+
+  const handleClear = async (mode: ClearMode) => {
+    await onClear(mode);
+    setShowClear(false);
+  };
+
   return (
     <aside className="w-96 border-r border-slate-200 bg-white flex flex-col h-full">
       <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
         <h1 className="font-semibold text-slate-700">Endpoints</h1>
-        <button
-          onClick={onRefresh}
-          className="text-xs text-slate-500 hover:text-slate-900"
-        >
-          refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onRefresh}
+            className="text-xs text-slate-500 hover:text-slate-900"
+          >
+            refresh
+          </button>
+          <button
+            onClick={() => setShowClear(true)}
+            className="text-xs text-red-600 hover:text-red-700"
+          >
+            clear
+          </button>
+        </div>
+      </div>
+      <div className="px-3 py-2 border-b border-slate-200">
+        <input
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Filter endpoints…"
+          className="w-full text-sm px-2 py-1 border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-slate-400"
+        />
       </div>
       <ul className="flex-1 overflow-y-auto">
         {endpoints.length === 0 && (
@@ -33,7 +77,12 @@ export function Drawer({ endpoints, selectedId, onSelect, onRefresh }: Props) {
             No endpoints captured yet. Make a request through the proxy.
           </li>
         )}
-        {endpoints.map((e) => {
+        {endpoints.length > 0 && filtered.length === 0 && (
+          <li className="p-4 text-sm text-slate-400">
+            No endpoints match “{filter}”.
+          </li>
+        )}
+        {filtered.map((e) => {
           const active = e.id === selectedId;
           const method = e.method.toUpperCase();
           return (
@@ -73,6 +122,12 @@ export function Drawer({ endpoints, selectedId, onSelect, onRefresh }: Props) {
           );
         })}
       </ul>
+      {showClear && (
+        <ClearModal
+          onConfirm={handleClear}
+          onCancel={() => setShowClear(false)}
+        />
+      )}
     </aside>
   );
 }
