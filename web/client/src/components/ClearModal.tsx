@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function ClearModal({ onConfirm, onCancel }: Props) {
-  const [mode, setMode] = useState<ClearMode>('all');
+  const [mode, setMode] = useState<ClearMode>('unmodified');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,15 +42,16 @@ export function ClearModal({ onConfirm, onCancel }: Props) {
               type="radio"
               name="clear-mode"
               className="mt-1"
-              checked={mode === 'all'}
-              onChange={() => setMode('all')}
+              checked={mode === 'unmodified'}
+              onChange={() => setMode('unmodified')}
             />
             <span>
               <span className="block text-sm font-medium text-slate-800">
-                Clear everything
+                Clear requests without replacers
               </span>
               <span className="block text-xs text-slate-500">
-                Remove all captured requests.
+                Remove only requests that have no replacer. Replacers and their
+                requests are kept.
               </span>
             </span>
           </label>
@@ -59,15 +60,16 @@ export function ClearModal({ onConfirm, onCancel }: Props) {
               type="radio"
               name="clear-mode"
               className="mt-1"
-              checked={mode === 'keepModified'}
-              onChange={() => setMode('keepModified')}
+              checked={mode === 'all'}
+              onChange={() => setMode('all')}
             />
             <span>
               <span className="block text-sm font-medium text-slate-800">
-                Keep modified
+                Clear everything, including replacers
               </span>
               <span className="block text-xs text-slate-500">
-                Remove only requests without an active replacer.
+                Remove all captured requests <strong>and</strong> all replacers.
+                This cannot be undone.
               </span>
             </span>
           </label>

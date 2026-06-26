@@ -12,7 +12,7 @@ export function listEndpoints(): Promise<EndpointSummary[]> {
   return fetch('/api/endpoints').then((r) => jsonOrThrow<EndpointSummary[]>(r));
 }
 
-export type ClearMode = 'all' | 'keepModified';
+export type ClearMode = 'all' | 'unmodified';
 
 export function clearEndpoints(mode: ClearMode): Promise<{ deleted: number }> {
   return fetch('/api/endpoints/clear', {

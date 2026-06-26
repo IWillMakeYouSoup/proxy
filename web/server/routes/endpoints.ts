@@ -52,27 +52,35 @@ function hasReplacer(path: string): boolean {
   );
 }
 
-// mode 'all' removes every captured request; 'keepModified' removes only the
-// records that have no active request/response replacer.
+// mode 'all' removes every captured request AND every replacer;
+// 'unmodified' removes only the records that have no active
+// request/response replacer (leaving replacers untouched).
 endpointsRouter.post('/clear', (req, res) => {
   const mode = (req.body as { mode?: unknown })?.mode;
-  if (mode !== 'all' && mode !== 'keepModified') {
-    res.status(400).json({ error: "mode must be 'all' or 'keepModified'" });
+  if (mode !== 'all' && mode !== 'unmodified') {
+    res.status(400).json({ error: "mode must be 'all' or 'unmodified'" });
     return;
   }
-  if (!existsSync(ORIGINAL_DIR)) {
-    res.json({ deleted: 0 });
-    return;
-  }
-  const files = readdirSync(ORIGINAL_DIR).filter((f) => f.endsWith('.json'));
   let deleted = 0;
-  for (const f of files) {
-    if (mode === 'keepModified') {
-      const record = readRecord(join(ORIGINAL_DIR, f));
-      if (record && hasReplacer(record.request.path)) continue;
+  if (existsSync(ORIGINAL_DIR)) {
+    const files = readdirSync(ORIGINAL_DIR).filter((f) => f.endsWith('.json'));
+    for (const f of files) {
+      if (mode === 'unmodified') {
+        const record = readRecord(join(ORIGINAL_DIR, f));
+        if (record && hasReplacer(record.request.path)) continue;
+      }
+      unlinkSync(join(ORIGINAL_DIR, f));
+      deleted++;
     }
-    unlinkSync(join(ORIGINAL_DIR, f));
-    deleted++;
+  }
+  if (mode === 'all' && existsSync(REPLACERS_DIR)) {
+    const replacerFiles = readdirSync(REPLACERS_DIR).filter((f) =>
+      f.endsWith('.json'),
+    );
+    for (const f of replacerFiles) {
+      unlinkSync(join(REPLACERS_DIR, f));
+      deleted++;
+    }
   }
   res.json({ deleted });
 });
